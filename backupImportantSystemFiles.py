@@ -21,14 +21,23 @@ config.read(configFilePath)
 try:
     fileNames = config.get("backup", "fileNames").split("\n")
     cloudDirectory = config.get("backup", "cloudDirectory")
-    print(cloudDirectory)
-    print(fileNames)
+    #print(cloudDirectory)
+    #print(fileNames)
 except configparser.Error:
     print('Configuration file could not be read at the location: ' + configFilePath)
     sys.exit(1)
 
 try:
+    if cloudDirectory.startswith('"') and cloudDirectory.endswith('"'):
+            cloudDirectory = cloudDirectory[1:-1]
+
     for filename in fileNames:
-        shutil.copy2(os.path.expanduser(filename), os.path.dirname(cloudDirectory))
+        filename = os.path.expanduser(filename)
+        print('Copying file' + filename + ' to '+cloudDirectory+os.path.basename(filename))
+        shutil.copy2(filename, cloudDirectory)
 except shutil.Error:
     print('Error while copying files.')
+
+
+
+#TODO Match md5 sums of the file, if same do nothing, if different, append date in the filename.
